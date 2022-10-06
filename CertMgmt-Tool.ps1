@@ -3,17 +3,6 @@
  THIS SAMPLE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED 
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR 
  FITNESS FOR A PARTICULAR PURPOSE.
-
- This sample is not supported under any Microsoft standard support program or service. 
- The script is provided AS IS without warranty of any kind. Microsoft further disclaims all
- implied warranties including, without limitation, any implied warranties of merchantability
- or of fitness for a particular purpose. The entire risk arising out of the use or performance
- of the sample and documentation remains with you. In no event shall Microsoft, its authors,
- or anyone else involved in the creation, production, or delivery of the script be liable for 
- any damages whatsoever (including, without limitation, damages for loss of business profits, 
- business interruption, loss of business information, or other pecuniary loss) arising out of 
- the use of or inability to use the sample or documentation, even if Microsoft has been advised 
- of the possibility of such damages.
  ==============================================================================================
  #>
 
@@ -26,9 +15,7 @@
     display help.
 
    .Notes
-    AUTHOR: Andreas Luy, MSFT
-
-    #Requires -Version 1.0
+   Version 1.1
 
 #>
 
@@ -242,6 +229,7 @@ if (!($aEntCAs)) {
     $objCertRetrieveListBox.ColumnCount = 4
     $objCertRetrieveListBox.ColumnHeadersVisible = $true
     $objCertRetrieveListBox.SelectionMode = "FullRowSelect"
+    $objCertRetrieveListBox.ReadOnly = $true
     $objCertRetrieveListBox.Columns[0].Name = "RequestID"
     $objCertRetrieveListBox.Columns[1].Name = "RequesterName"
     $objCertRetrieveListBox.Columns[2].Name = "CommonName"
@@ -264,6 +252,8 @@ if (!($aEntCAs)) {
     $objCertOutFolder.Size = New-Object System.Drawing.Size(275,25)
     $objCertOutFolder.Multiline = $false ### Allows multiple lines of data
     $objCertOutFolder.AcceptsReturn = $false ### By hitting enter it creates a new line
+    $objCertOutFolder.ReadOnly = $true
+
 
     $objCertFolderSelectBtn = New-Object System.Windows.Forms.Button
     $objCertFolderSelectBtn.Cursor = [System.Windows.Forms.Cursors]::Hand
@@ -296,6 +286,7 @@ if (!($aEntCAs)) {
     $objResultTextBox.ReadOnly = $true 
     $objResultTextBox.Multiline = $true
     $objResultTextBox.AcceptsReturn = $true 
+    $objResultTextBox.Text = ""
 
 # form execution buttons
     $objBtnOk = New-Object System.Windows.Forms.Button
@@ -351,7 +342,11 @@ if (!($aEntCAs)) {
             if (Test-Path $objCsrInputField.Text) {
                 $Csr = Dump-Request -ReqFileName $objCsrInputField.Text
                 $objSubmitCsrTextBox.Text = ("Subject: " + $Csr.subjectName + "`r`nEnhanced Key Usage: " + $csr.enhancedKeyUsage + "`r`nKey Length: " + $Csr.KeyLength + "`r`n")
-                $objSubmitCsrTextBox.Text += ("SAN(s): " + ($Csr.san|ForEach-Object {("`r`n    " + $_.Type + " = " + $_.SAN)}))
+                if ($Csr.san) {
+                    $objSubmitCsrTextBox.Text += ("SAN(s): " + ($Csr.san|ForEach-Object {("`r`n    " + $_.Type + " = " + $_.SAN)}))
+                } else {
+                    $objSubmitCsrTextBox.Text += ("SAN(s): " + "No SANs found in CSR!")
+                }
             }
         }
     })
@@ -494,7 +489,7 @@ if (!($aEntCAs)) {
     })
 
     $objBtnOk.Add_Click({
-        $objResultTextBox.Text = ""
+#        $objResultTextBox.Text = ""
 
         Switch ($Script:CertTask) {
             "Submit" {
@@ -516,7 +511,7 @@ if (!($aEntCAs)) {
                     } else {
                         $FolderName = $objCertOutFolder.Text
                     }
-                    $ReqID = ($objCertRetrieveListBox.SelectedItem).SubString(0,10).trim() 
+                    $ReqID = ($objCertRetrieveListBox.CurrentRow.Cells.Item(0).value).trim() 
                     $objResultTextBox.Text = Retrieve-Cert -TargetCACnfg $Script:CACnfg -FolderName $FolderName -RequestID $ReqID
                     $objCertOutFolder.Clear()
                 }
