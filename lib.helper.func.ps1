@@ -580,6 +580,7 @@ Function Retrieve-PendingCerts
                 if (Test-Path $TmpFileName -ErrorAction Ignore) {
                     $CertDump =Dump-Request -ReqFileName $TmpFileName
                 }
+                Remove-Item $TmpFileName -Force
                 $objResult = "" | Select-Object RequestID,RequesterName,CommonName,SAN
                 $objResult.RequestID = $_.($ListHeader[0])
                 $objResult.RequesterName = $_.($ListHeader[1])
