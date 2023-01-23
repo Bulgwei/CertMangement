@@ -561,12 +561,14 @@ Function Retrieve-PendingCerts
         [Parameter(mandatory=$true)][String]$TargetCACnfg
     )
 
+    $TmpFileName = $env:temp + "\TmpDump.tmp"
+
     $objResultTextBox.Text = " "
     # defining target list with dimensions (chars): ReqID:10, RequesterName:40, CommonName:30, SAN:50
     $aResultList = @()
 
     # verify if request has been issued
-    $result = ConvertFrom-Csv (certutil -config $TargetCACnfg -view -restrict "disposition=9" -out "RequestID, Requestername, CommonName" csv)
+    $result = ConvertFrom-Csv (certutil -config $TargetCACnfg -view -restrict "disposition=9" -out "RequestID, Requestername, CommonName, RawRequest" csv)
     if ($result -ne $null) {
         if ($result -like "*fail*") {
             $objResultTextBox.Text = ("CA database query failed!`r`n`r`n" + $result.ToString())
@@ -574,11 +576,17 @@ Function Retrieve-PendingCerts
             $ListHeader = $result[0].psobject.properties.name #getting column names from PsObject (csv) as certutil will drop out localized names instead of real db schema names
             # crawling for SAN extensions
             $result | ForEach-Object {
+                $RawResult = certutil -config $TargetCACnfg -view -restrict "requestid=$($_.($ListHeader[0]))" -out Request.RawRequest > $TmpFileName
+                if (Test-Path $TmpFileName -ErrorAction Ignore) {
+                    $CertDump =Dump-Request -ReqFileName $TmpFileName
+                }
                 $objResult = "" | Select-Object RequestID,RequesterName,CommonName,SAN
                 $objResult.RequestID = $_.($ListHeader[0])
                 $objResult.RequesterName = $_.($ListHeader[1])
                 $objResult.CommonName = $_.($ListHeader[2])
-                $objResult.SAN = ""
+                $CertDump.SAN|ForEach-Object {
+                    $objResult.SAN = $objResult.SAN + ";" + $_
+                }
 
                 $aResultList += $objResult
             }
@@ -715,4 +723,3 @@ function Deny-CertRequest
 
 
 }
-
