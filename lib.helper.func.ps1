@@ -577,18 +577,29 @@ Function Retrieve-PendingCerts
             # crawling for SAN extensions
             $result | ForEach-Object {
                 $RawResult = certutil -config $TargetCACnfg -view -restrict "requestid=$($_.($ListHeader[0]))" -out Request.RawRequest > $TmpFileName
+                if ($RawResult -match "Binary Request: EMPTY") {
+                    $Msg = "Could not load certificate request on request ID " + $_.($ListHeader[0]) + "..."
+                } elseif ($RawResult -match "Too many arguments") {
+                    $Msg = "Error in query syntax!`r`n" + $RawResult 
+                } elseif ($RawResult -match "CertUtil [Options]") {
+                    $Msg = "Error in query syntax!`r`n" + $RawResult 
+                } else {
+                    $RawResult|Set-Content $TmpFileName -ErrorAction SilentlyContinue
                 if (Test-Path $TmpFileName -ErrorAction Ignore) {
                     $CertDump =Dump-Request -ReqFileName $TmpFileName
+                    if ($CertDump -match "command FAILED") {
+                        $Msg = "Could not enumerate SANs on request ID " + $_.($ListHeader[0]) + "..."
+                    } else {
+                        Remove-Item $TmpFileName -Force
+                        $objResult = "" | Select-Object RequestID,RequesterName,CommonName,SAN
+                        $objResult.RequestID = $_.($ListHeader[0])
+                        $objResult.RequesterName = $_.($ListHeader[1])
+                        $objResult.CommonName = $_.($ListHeader[2])
+                        $CertDump.SAN|ForEach-Object {
+                            $objResult.SAN = $objResult.SAN + ";" + $_
+                        }
+                    }
                 }
-                Remove-Item $TmpFileName -Force
-                $objResult = "" | Select-Object RequestID,RequesterName,CommonName,SAN
-                $objResult.RequestID = $_.($ListHeader[0])
-                $objResult.RequesterName = $_.($ListHeader[1])
-                $objResult.CommonName = $_.($ListHeader[2])
-                $CertDump.SAN|ForEach-Object {
-                    $objResult.SAN = $objResult.SAN + ";" + $_
-                }
-
                 $aResultList += $objResult
             }
         }
@@ -625,11 +636,11 @@ function Display-RawData
     switch ($Mode) {
         "Retrieval" {
             $result = certutil -config $TargetCACnfg -view -restrict "requestid=$RequestID" -out rawcertificate
-            if ($a -match "Binary Certificate: EMPTY") {
+            if ($result -match "Binary Certificate: EMPTY") {
                 $Msg = "Could not load certificate on request ID " + $RequestID + "..."
-            } elseif ($a -match "Too many arguments") {
+            } elseif ($result -match "Too many arguments") {
                 $Msg = "Error in query syntax!`r`n" + $result 
-            } elseif ($a -match "CertUtil [Options]") {
+            } elseif ($result -match "CertUtil [Options]") {
                 $Msg = "Error in query syntax!`r`n" + $result 
             } else {
                 $result|Set-Content $TmpFileName -ErrorAction SilentlyContinue
@@ -649,11 +660,11 @@ function Display-RawData
         }
         "ShowPending" {
             $result = certutil -config $TargetCACnfg -view -restrict "requestid=$RequestID" -out Request.RawRequest
-            if ($a -match "Binary Request: EMPTY") {
+            if ($result -match "Binary Request: EMPTY") {
                 $Msg = "Could not load certificate request on request ID " + $RequestID + "..."
-            } elseif ($a -match "Too many arguments") {
+            } elseif ($result -match "Too many arguments") {
                 $Msg = "Error in query syntax!`r`n" + $result 
-            } elseif ($a -match "CertUtil [Options]") {
+            } elseif ($result -match "CertUtil [Options]") {
                 $Msg = "Error in query syntax!`r`n" + $result 
             } else {
                 $result|Set-Content $TmpFileName -ErrorAction SilentlyContinue
@@ -665,6 +676,7 @@ function Display-RawData
                         Show-Window -Title "Raw Certificate Request Data" -AddVScrollBar -OKWindow -Text $CertDump -width 1000 -height 800 -AlwaysTop $true -ReadOnly
                         $Msg = "Operation completed successful ..."
                     }
+                    Remove-Item $TmpFileName -Force
                 } else {
                     $Msg = "Could not dump certificate request on request ID " + $RequestID + "..."
                 }
