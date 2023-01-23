@@ -26,7 +26,7 @@ $BaseDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 # loading all Libary Scripts we depend on
 Get-ChildItem -Path "$Script:BaseDirectory" -Filter lib*.ps1 | ForEach-Object {
     Try {
-        Write-Verbose -Message "Loading $($_.FullName)"
+        Write-Host "[INFO] Loading library $($_.FullName)" -ForegroundColor Green
         . ($_.FullName)
     }
     Catch {
@@ -183,14 +183,14 @@ if (!($aEntCAs)) {
     [System.Windows.Forms.ToolStripItem]$CxtRetrieveMnuStrip1Item1 = New-Object System.Windows.Forms.ToolStripMenuItem
     [System.Windows.Forms.ToolStripItem]$CxtRetrieveMnuStrip1Item2 = New-Object System.Windows.Forms.ToolStripMenuItem
     [System.Windows.Forms.ToolStripItem]$CxtRetrieveMnuStrip1Item3 = New-Object System.Windows.Forms.ToolStripMenuItem
-    $CxtRetrieveMnuStrip1Item1.Text = "Show Binary Data";
-    $CxtRetrieveMnuStrip1Item2.Text = "Issue";
-    $CxtRetrieveMnuStrip1Item3.Text = "Deny";
+    $CxtRetrieveMnuStrip1Item1.Text = "Show Binary Data"
+    $CxtRetrieveMnuStrip1Item2.Text = "Issue"
+    $CxtRetrieveMnuStrip1Item3.Text = "Deny"
     $CxtRetrieveMnuStrip1Item2.Enabled = $False
     $CxtRetrieveMnuStrip1Item3.Enabled = $False
-    $contextMenuRetrieveStrip1.Items.Add($CxtRetrieveMnuStrip1Item1);
-    $contextMenuRetrieveStrip1.Items.Add($CxtRetrieveMnuStrip1Item2);
-    $contextMenuRetrieveStrip1.Items.Add($CxtRetrieveMnuStrip1Item3);
+    $contextMenuRetrieveStrip1.Items.Add($CxtRetrieveMnuStrip1Item1)|Out-Null
+    $contextMenuRetrieveStrip1.Items.Add($CxtRetrieveMnuStrip1Item2)|Out-Null
+    $contextMenuRetrieveStrip1.Items.Add($CxtRetrieveMnuStrip1Item3)|Out-Null
 #endregion
 
     $objTimeIntLabel = new-object System.Windows.Forms.Label
@@ -539,7 +539,6 @@ Load-InitialFormContent -arrEntCAs $aEntCAs -arrTime $aTimeInterval
 
 $objForm.Add_Shown({$objForm.Activate()})
 [void]$objForm.ShowDialog()
-
 
 
 
