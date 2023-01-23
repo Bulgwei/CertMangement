@@ -585,22 +585,23 @@ Function Retrieve-PendingCerts
                     $Msg = "Error in query syntax!`r`n" + $RawResult 
                 } else {
                     $RawResult|Set-Content $TmpFileName -ErrorAction SilentlyContinue
-                if (Test-Path $TmpFileName -ErrorAction Ignore) {
-                    $CertDump =Dump-Request -ReqFileName $TmpFileName
-                    if ($CertDump -match "command FAILED") {
-                        $Msg = "Could not enumerate SANs on request ID " + $_.($ListHeader[0]) + "..."
-                    } else {
-                        Remove-Item $TmpFileName -Force
-                        $objResult = "" | Select-Object RequestID,RequesterName,CommonName,SAN
-                        $objResult.RequestID = $_.($ListHeader[0])
-                        $objResult.RequesterName = $_.($ListHeader[1])
-                        $objResult.CommonName = $_.($ListHeader[2])
-                        $CertDump.SAN|ForEach-Object {
-                            $objResult.SAN = $objResult.SAN + ";" + $_
+                    if (Test-Path $TmpFileName -ErrorAction Ignore) {
+                        $CertDump =Dump-Request -ReqFileName $TmpFileName
+                        if ($CertDump -match "command FAILED") {
+                            $Msg = "Could not enumerate SANs on request ID " + $_.($ListHeader[0]) + "..."
+                        } else {
+                            Remove-Item $TmpFileName -Force
+                            $objResult = "" | Select-Object RequestID,RequesterName,CommonName,SAN
+                            $objResult.RequestID = $_.($ListHeader[0])
+                            $objResult.RequesterName = $_.($ListHeader[1])
+                            $objResult.CommonName = $_.($ListHeader[2])
+                            $CertDump.SAN|ForEach-Object {
+                                $objResult.SAN = $objResult.SAN + ";" + $_
+                            }
                         }
                     }
+                    $aResultList += $objResult
                 }
-                $aResultList += $objResult
             }
         }
     }
