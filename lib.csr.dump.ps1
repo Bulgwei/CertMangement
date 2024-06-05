@@ -270,8 +270,8 @@ function Get-EnhancedKeyUsage
                 $EkuList|ForEach-Object{
  	                $Ekuobj="" | Select Name,OID
                     if(!($_.trim() -eq "")){
-                        $Ekuobj.Name=$_.split("(")[0]
-                        $Ekuobj.OID=$_.split("(")[1]
+                        $Ekuobj.Name=$_.split("(")[0].trim()
+                        $Ekuobj.OID=$_.split("(")[1].trim()
                         $EnhKeyUsage+=$Ekuobj
                     }
                 }
