@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CertMgmt Web</title>
+    <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+    <header>
+        <h1>CertMgmt Web UI</h1>
+        <p>Manage ADCS certificate enrollment, retrieval, and pending requests from a browser.</p>
+    </header>
+
+    <section class="panel">
+        <h2>Certificate Authority</h2>
+        <div class="form-row">
+            <label for="caSelect">Target CA</label>
+            <select id="caSelect"></select>
+            <button id="refreshCaBtn">Refresh CAs</button>
+        </div>
+        <div class="form-row">
+            <label>Status</label>
+            <span id="caStatus">Not loaded</span>
+        </div>
+    </section>
+
+    <div class="tabs">
+        <button class="tab-button active" data-tab="submit">Submit Request</button>
+        <button class="tab-button" data-tab="retrieve">Retrieve Certificates</button>
+        <button class="tab-button" data-tab="pending">Pending Requests</button>
+    </div>
+
+    <div id="submit-tab" class="tab-content active">
+        <section class="panel">
+            <h2>Submit Request</h2>
+            <div class="form-row">
+                <label for="csrFile">CSR File</label>
+                <input type="file" id="csrFile" accept=".csr,.req" />
+                <button id="dumpCsrBtn">Upload & Inspect</button>
+            </div>
+            <div class="form-row">
+                <label for="templateSelect">Template</label>
+                <select id="templateSelect"></select>
+            </div>
+            <div class="form-row">
+                <button id="submitRequestBtn">Submit to CA</button>
+            </div>
+            <div class="preview" id="csrPreview">Upload a CSR to inspect subject, SAN, and request details.</div>
+        </section>
+    </div>
+
+    <div id="retrieve-tab" class="tab-content">
+        <section class="panel">
+            <h2>Retrieve Certificates</h2>
+            <div class="form-row">
+                <label for="requesterName">Requester Name</label>
+                <input id="requesterName" placeholder="Leave empty for all" />
+            </div>
+            <div class="form-row">
+                <label for="timeWindow">Time Window</label>
+                <select id="timeWindow">
+                    <option value="1">1 day</option>
+                    <option value="7" selected>7 days</option>
+                    <option value="14">14 days</option>
+                    <option value="30">30 days</option>
+                    <option value="90">90 days</option>
+                </select>
+                <button id="loadIssuedBtn">Load Issued Certificates</button>
+            </div>
+            <div class="form-row">
+                <label for="outputFolder">Output Folder</label>
+                <input id="outputFolder" placeholder="e.g. C:\\Temp\\" />
+            </div>
+            <div class="table-wrapper">
+                <table id="issuedTable">
+                    <thead>
+                        <tr><th>Request ID</th><th>Requester</th><th>CN</th><th>SAN</th><th>Action</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div id="pending-tab" class="tab-content">
+        <section class="panel">
+            <h2>Pending Requests</h2>
+            <div class="form-row">
+                <button id="loadPendingBtn">Load Pending Requests</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="pendingTable">
+                    <thead>
+                        <tr><th>Request ID</th><th>Requester</th><th>CN</th><th>SAN</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <section class="panel">
+        <h2>Activity Log</h2>
+        <pre id="activityLog"></pre>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,169 @@
+body {
+    font-family: Segoe UI, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f7fb;
+    color: #203040;
+}
+
+header {
+    background: #1f4b8f;
+    color: #fff;
+    padding: 24px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+.panel {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    margin: 18px auto;
+    max-width: 1080px;
+    padding: 18px;
+}
+
+.panel h2 {
+    margin-top: 0;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.form-row label {
+    min-width: 140px;
+    font-weight: 600;
+}
+
+.form-row input,
+.form-row select,
+.form-row button {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #c5cdd9;
+}
+
+.form-row button {
+    background: #1f4b8f;
+    color: #fff;
+    border-color: transparent;
+    cursor: pointer;
+}
+
+.form-row button:hover {
+    background: #163d72;
+}
+
+.preview {
+    border: 1px solid #d3dce6;
+    border-radius: 8px;
+    padding: 14px;
+    min-height: 120px;
+    white-space: pre-wrap;
+    background: #f8fbff;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #e5ebf2;
+    text-align: left;
+    vertical-align: top;
+}
+
+table th {
+    background: #f1f6ff;
+}
+
+.activity-log {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    margin: 0;
+    min-height: 120px;
+    padding: 14px;
+    background: #111f33;
+    color: #d0d8e8;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin: 18px auto;
+    max-width: 1080px;
+}
+
+.tab-button {
+    background: #e5ebf2;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 8px 8px 0 0;
+    margin-right: 4px;
+    transition: background 0.3s;
+}
+
+.tab-button.active {
+    background: #1f4b8f;
+    color: #fff;
+}
+
+.tab-button:hover {
+    background: #c5cdd9;
+}
+
+.tab-button.active:hover {
+    background: #163d72;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@media (max-width: 720px) {
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-row label {
+        min-width: auto;
+    }
+
+    .tabs {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tab-button {
+        margin-bottom: 4px;
+        margin-right: 0;
+        border-radius: 8px;
+    }
+}
